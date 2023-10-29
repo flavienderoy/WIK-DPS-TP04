@@ -93,7 +93,7 @@ spec:
     namespace: my-namespace
   spec:
     rules:
-    - host: wik-dps-tp04.nomdedomaine.com  # Remplacez par le nom de domaine de votre choix
+    - host: wik-dps-tp04.nomdedomaine.com  # Nom de domaine
       http:
         paths:
         - path: /
