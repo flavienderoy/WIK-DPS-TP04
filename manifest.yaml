@@ -1,0 +1,104 @@
+### Créer un POD
+
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: wik-dps-tp04-pod
+#   namespace: my-namespace
+# spec:
+#   containers:
+#   - name: wik-dps-tp04
+#     image: registry.cluster.wik.cloud/public/echo
+#     ports:
+#     - containerPort: 8080
+
+
+### Créer avec un ReplicaSet
+
+# apiVersion: apps/v1
+# kind: ReplicaSet
+# metadata:
+#   name: wik-dps-tp04-replicaset
+#   namespace: my-namespace
+# spec:
+#   replicas: 4
+#   selector:
+#     matchLabels:
+#       app: wik-dps-tp04
+#   template:
+#     metadata:
+#       labels:
+#         app: wik-dps-tp04
+#     spec:
+#       containers:
+#       - name: wik-dps-tp04
+#         image: registry.cluster.wik.cloud/public/echo
+#         ports:
+#         - containerPort: 8080
+
+### Créer avec un Deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wik-dps-tp04-deployment
+  namespace: my-namespace
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+  selector:
+    matchLabels:
+      app: wik-dps-tp04
+  template:
+    metadata:
+      labels:
+        app: wik-dps-tp04
+    spec:
+      containers:
+      - name: wik-dps-tp04
+        image: registry.cluster.wik.cloud/public/echo
+        ports:
+        - containerPort: 8080
+
+
+### Créer un Service avec le Deployment et les anciens Pods
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wik-dps-tp04-service
+  namespace: my-namespace
+spec:
+  selector:
+    app: wik-dps-tp04
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+
+---
+
+### Créer un Ingress
+
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: wik-dps-tp04-ingress
+    namespace: my-namespace
+  spec:
+    rules:
+    - host: wik-dps-tp04.nomdedomaine.com  # Remplacez par le nom de domaine de votre choix
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: wik-dps-tp04-service
+              port:
+                number: 80
